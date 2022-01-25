@@ -1,31 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import { Loader } from 'react-loader-spinner';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import MakeEditor from './MakeEditor';
+import GenderRenderer from './genderRenderer';
+import MoodRenderer from './moodRenderer';
 
 const App = () => {
     const rowData = [
-        { make: "Toyota", model: "Celica", price: 35000, edicell: "Bug" },
-        { make: "Ford", model: "Mondeo", price: 32000, edicell: "Bug" },
-        { make: "Porsche", model: "Boxter", price: 72000, edicell: "Bug" },
-        { make: "Toyota", model: "Corola", price: 35000, edicell: "Bug" },
-        { make: "Ford", model: "Fiesta", price: 32000, edicell: "Bug" },
-        { make: "Hundai", model: "Verna", price: 72000, edicell: "Bug" },
-        { make: "Toyota", model: "Celica", price: 35000, edicell: "Bug" },
-        { make: "Ford", model: "Mondeo", price: 32000, edicell: "Bug" },
-        { make: "Porsche", model: "Boxter", price: 72000, edicell: "Bug" }
+        { make: "Toyota", model: "Celica", price: 35000, edicell: "Bug" ,value: 'male' },
+        { make: "Ford", model: "Mondeo", price: 32000, edicell: "Bug", value: 'male' },
+        { make: "Porsche", model: "Boxter", price: 72000, edicell: "Bug",value: 'male' },
+        { make: "Toyota", model: "Corola", price: 35000, edicell: "Bug",value: 'male' },
+        { make: "Ford", model: "Fiesta", price: 32000, edicell: "Bug",value: 'male' },
+        { make: "Hundai", model: "Verna", price: 72000, edicell: "Bug",value: 'male' },
+        { make: "Toyota", model: "Celica", price: 35000, edicell: "Bug",value: 'male' },
+        { make: "Ford", model: "Mondeo", price: 32000, edicell: "Bug",value: 'male' },
+        { make: "Porsche", model: "Boxter", price: 72000, edicell: "Bug",value: 'male' }
     ];
     const columns = [
         { key: "make", name: "MAKE" },
         { key: "model", name: "MODEL" },
         { key: "price", name: "PRICE" },
-        { key: "edicell", name: "Task Type", cellEditorFramework: MakeEditor }
+        { key: "edicell", name: "Task Type", cellEditorFramework: MakeEditor },
+        {key: "value", name: "Value"}
     ];
     const frameworkComponents = {
-        'MakeEditor': MakeEditor
+        'MakeEditor': MakeEditor,
+        genderCellRenderer: GenderRenderer,
+            moodCellRenderer: MoodRenderer,
     };
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -44,7 +48,7 @@ const App = () => {
         //   .then((data) => updateData(data));
     };
     const onPaginationChanged = () => {
-        console.log('onPaginationPageLoaded');
+       // console.log('onPaginationPageLoaded');
         if (gridApi) {
             setText('#lbLastPageFound', gridApi.paginationIsLastPageFound());
             setText('#lbPageSize', gridApi.paginationGetPageSize());
@@ -60,7 +64,7 @@ const App = () => {
         document.querySelector('#btLast').disabled = disabled;
     }
 
-    const onLoad=()=>{
+    const onLoad = () => {
         gridApi.paginationGoToPage(0);
     }
 
@@ -110,6 +114,23 @@ const App = () => {
                 <AgGridColumn field="model"></AgGridColumn>
                 <AgGridColumn field="price"></AgGridColumn>
                 <AgGridColumn field="edicell" editable={true} cellEditor="MakeEditor"></AgGridColumn>
+                <AgGridColumn
+                   // headerName="Rendered Value"
+                    field="value"
+                    cellRendererSelector={(params) => {
+                        const moodDetails = { component: 'moodCellRenderer' };
+                        const genderDetails = {
+                            component: 'genderCellRenderer',
+                            params: {
+                                values: ['Male', 'Female'],
+                            },
+                        };
+                        console.log(params);
+                        if (params.value === 'male') return genderDetails;
+                        else if (params.value === 'happy') return moodDetails;
+                        else return undefined;
+                    }}
+                />
 
             </AgGridReact>
             <div className="example-wrapper">
@@ -125,17 +146,17 @@ const App = () => {
                         <option value="1000">1000</option>
                     </select>
 
-                        <span> 1- itemsize of totalnoofitems</span>
-                        {/* <button onClick={() => onBtFirst()}>To First</button>
+                    <span> 1- itemsize of totalnoofitems</span>
+                    {/* <button onClick={() => onBtFirst()}>To First</button>
                         <button onClick={() => onBtLast()} id="btLast">
                             To Last
                         </button> */}
-                        <span>CurrentPage of TotalPages</span>
-                        <button onClick={() => onBtPrevious()}>To Previous</button>
-                        <button onClick={() => onBtNext()}>To Next</button>
-                        <button onClick={() => onBtPageFive()}>To Page 5</button>
-                        <button onClick={() => onBtPageFifty()}>To Page 50</button>
-                    
+                    <span>CurrentPage of TotalPages</span>
+                    <button onClick={() => onBtPrevious()}>To Previous</button>
+                    <button onClick={() => onBtNext()}>To Next</button>
+                    <button onClick={() => onBtPageFive()}>To Page 5</button>
+                    <button onClick={() => onBtPageFifty()}>To Page 50</button>
+
 
                     <div style={{ marginTop: '6px' }}>
                         <span className="label">Last Page Found:</span>
